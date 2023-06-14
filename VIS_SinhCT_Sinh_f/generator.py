@@ -130,6 +130,7 @@ class Formula_generator(Base):
             current_formula2 = state['current_formula2']
             current_operator = state['current_operator']
             F_thu = state['operand']
+            F_thu -= 1
             F2 = state['F_current']
         except FileNotFoundError:
             print("Chạy lần đầu . Tiến hành lưu file")
@@ -223,16 +224,22 @@ class Formula_generator(Base):
                             current_operator += 1
                             if current_operator > 3 : 
                                 current_operator = 0 
+                            if F_thu >= 2 :
+                                if self.count[0] >= self.count[1] or self.count[2] >= self.count[3] :
+                                    self.save_historyex(F_new_formula,current_formula1,current_formula2,current_operator,F_thu,F2)
 
-                            if self.count[0] >= self.count[1] or self.count[2] >= self.count[3]:
-                                self.save_historyex(F_new_formula,current_formula1,current_formula2,current_operator,F_thu,F2)
-                                break
             if len(F1) == 0:
                 break
             F_new_formula = F1
             F2 = []
+            self.list_f = []
+            self.list_f_pro = []
+            self.list_inv_cyc = []
+            self.list_inv_pro = []
+            self.count = np.array([0, num_f_per_file, 0, num_f_target])
             # Save the current state
 
+            
         return
     
     def __generation_method_1(self, num_f_per_file: int, num_f_target: int):
