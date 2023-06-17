@@ -118,7 +118,7 @@ class Formula_generator(Base):
         self.generation_method(num_f_per_file, num_f_target)
 
     def __generation_method_2(self, num_f_per_file: int, num_f_target: int):
-
+        self.method = 2
         self.target = -1000
         F_intital  = [str(i) for i in range(int(self.OPERAND.shape[0]))] 
         F0 = generate_random_formula(F_intital)
@@ -216,7 +216,7 @@ class Formula_generator(Base):
                 self.save_historyex(F_new_formula,current_formula1,current_formula2,current_operator,F_thu,F2)
 
             if len(F1) == 0:
-                print('Đã sinh xong đến F cuối cùng ('+f'{F_thu*2})'+' . Bắt đầu test lại xem  F '+f'{(F_thu+1)*2}' +'có công thức nào tốt hơn không')
+                print('Đã sinh xong đến F cuối cùng ('+f'{F_thu*2})')
                 break
             F_new_formula = F1
             F2 = []
@@ -226,74 +226,6 @@ class Formula_generator(Base):
             self.list_inv_pro = []
             self.count = np.array([0, num_f_per_file, 0, num_f_target])
 
-
-        # Save the current state
-        for i in range(1): 
-            print(F_new_formula)
-            F2 = []
-            self.list_f = []
-            self.list_f_pro = []
-            self.list_inv_cyc = []
-            self.list_inv_pro = []
-            self.count = np.array([0, num_f_per_file, 0, num_f_target])
-            F_thu += 1
-
-            print(f"Đang chạy sinh công thức, số toán hạng là {F_thu*2}")
-            F1 = [] 
-            current_formula1 = 0
-            current_formula2 = 0
-            current_operator = 0 
-            for formula1 in range(current_formula1,len(F0)):
-                for formula2 in range(current_formula2,len(F_new_formula)):
-                    self.target = 0
-                    weight = np.zeros(self.OPERAND.shape[1])
-                    expression = F_new_formula[formula2]
-                    operands = {}
-                    for i, operand in enumerate(self.OPERAND):
-                        operands[f'A{i}'] = operand
-
-                    # Replace numbers with corresponding variable names
-                    for i, operand in enumerate(operands):
-                        
-                        expression = expression.replace(str(i), operand)
-                    weight += eval(expression, {}, operands)
-                    weight[np.isnan(weight)] = -1.7976931348623157e+308
-                    weight[np.isinf(weight)] = -1.7976931348623157e+308
-                    self.count[0:3:2] += (self.__handler2(weight.reshape(1, self.OPERAND.shape[1]), F_new_formula[formula2]))
-                    if F0[formula1] != F_new_formula[formula2]:
-                        operators = ['+', '-', '*', '/'] 
-
-                        for operator in range(current_operator,len(operators)):
-
-                            combined_formula = combine_formulas(F0[formula1], F_new_formula[formula2], operators[operator])
-                            weight = np.zeros(self.OPERAND.shape[1])
-                            expression = combine_formulas(F0[formula1], F_new_formula[formula2], operators[operator])
-                            operands = {}
-                            for i, operand in enumerate(self.OPERAND):
-                                operands[f'A{i}'] = operand
-
-                            # Replace numbers with corresponding variable names
-                            for i, operand in enumerate(operands):
-                                
-                                expression = expression.replace(str(i), operand)
-
-                            weight += eval(expression, {}, operands)
-                            weight[np.isnan(weight)] = -1.7976931348623157e+308
-                            weight[np.isinf(weight)] = -1.7976931348623157e+308
-                            l = (self.__handler2(weight.reshape(1, self.OPERAND.shape[1]), combined_formula))
-                            self.count[0:3:2] += l
-                            if combined_formula not in F2 and l > 0:
-                                F1.append(combined_formula)
-                            if combined_formula not in F2 :
-                                F2.append(combined_formula)
-                            current_formula1 = formula1
-                            current_formula2 = formula2
-                            current_operator = operator
-                            current_operator += 1
-                            if current_operator > 3 : 
-                                current_operator = 0 
-
-        self.save_historyex(F_new_formula,current_formula1,current_formula2,current_operator,F_thu,F2)
         return
     
     def __generation_method_1(self, num_f_per_file: int, num_f_target: int):
@@ -507,7 +439,7 @@ class Formula_generator(Base):
             remaining_chunk = df.iloc[start_index:]  # Extract the remaining rows
             path = self.path + f"formula_"+f'{F_thu*2}'+f'{remaining_rows}'+ ".csv"
             remaining_chunk.to_csv(path, index=False)  # Save the remaining chunk as a CSV file
-        print('đã lưu công thức')
+        print('Đã lưu công thức')
         return False
     
 
@@ -557,42 +489,6 @@ class Formula_generator(Base):
             f_profit = np.prod(temp)**(1.0/len(temp))
             return f_profit, f_profit >= self.target
 
-    def __handler2(self, weights, formulas):
-        count = 0
-        if self.multiple_cycles:
-            for w_i in range(weights.shape[0]):
-                for c_i in range(self.number_cycle):
-                    weight = weights[w_i][self.INDEX[c_i]:]
-                    indexes, values, profits = self.investment_method(weight, c_i)
-                    f_profit, check = self.measurement_method(weight, indexes, values, profits)
-                    try:
-                        self.list_f.append(self.convert_arrF_to_strF(formulas[w_i]))
-                    except:
-                        self.list_f.append(formulas)
-                    self.list_f_pro.append(f_profit)
-                    self.list_inv_cyc.append(self.__last_cyc - c_i)
-                    if type(indexes[0]) == int or type(indexes[0]) == np.int64:
-                        self.list_inv_pro.append(profits[-1])
-                    elif type(indexes[0]) == list or type(indexes[0]) == np.ndarray:
-                        self.list_inv_pro.append(np.mean(profits[-1]))
-                    count += 1
-        else:
-            for w_i in range(weights.shape[0]):
-                indexes, values, profits = self.investment_method(weights[w_i], 0)
-                f_profit, check = self.measurement_method(weights[w_i], indexes, values, profits)
-                try:
-                    self.list_f.append(self.convert_arrF_to_strF(formulas[w_i]))
-                except:
-                    self.list_f.append(formulas)
-                self.list_f_pro.append(f_profit)
-                self.list_inv_cyc.append(self.__last_cyc)
-                if type(indexes[0]) == int or type(indexes[0]) == np.int64:
-                    self.list_inv_pro.append(profits[-1])
-                elif type(indexes[0]) == list or type(indexes[0]) == np.ndarray:
-                    self.list_inv_pro.append(np.mean(profits[-1]))
-
-                count += 1
-        return count
     
     def __handler(self, weights, formulas):
         count = 0
@@ -603,9 +499,9 @@ class Formula_generator(Base):
                     indexes, values, profits = self.investment_method(weight, c_i)
                     f_profit, check = self.measurement_method(weight, indexes, values, profits)
                     if check:
-                        try:
+                        if '2' not in str(self.generation_method)[:60]:
                             self.list_f.append(self.convert_arrF_to_strF(formulas[w_i]))
-                        except:
+                        else:
                             self.list_f.append(formulas)
                         self.list_f_pro.append(f_profit)
                         self.list_inv_cyc.append(self.__last_cyc - c_i)
@@ -619,9 +515,9 @@ class Formula_generator(Base):
                 indexes, values, profits = self.investment_method(weights[w_i], 0)
                 f_profit, check = self.measurement_method(weights[w_i], indexes, values, profits)
                 if check:
-                    try:
+                    if '2' not in str(self.generation_method)[:60]:
                         self.list_f.append(self.convert_arrF_to_strF(formulas[w_i]))
-                    except:
+                    else:
                         self.list_f.append(formulas)
                     self.list_f_pro.append(f_profit)
                     self.list_inv_cyc.append(self.__last_cyc)
