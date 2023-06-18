@@ -208,11 +208,11 @@ class Formula_generator(Base):
                             current_operator += 1
                             if current_operator > 3 : 
                                 current_operator = 0 
-                            if F_thu >= 2 :
+                            if F_thu >= 3:
                                 if self.count[2] >= self.count[3] :
                                     self.save_historyex(F_new_formula,current_formula1,current_formula2,current_operator,F_thu,F2)
                                     raise Exception("Đã sinh đủ công thức")
-            if F_thu >= 2 :
+            if F_thu >= 3 :
                 self.save_historyex(F_new_formula,current_formula1,current_formula2,current_operator,F_thu,F2)
 
             if len(F1) == 0:
