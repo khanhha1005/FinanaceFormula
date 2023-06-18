@@ -173,7 +173,7 @@ class Formula_generator(Base):
                     weight[np.isinf(weight)] = -1.7976931348623157e+308
                     self.count[0:3:2] += (self.__handler(weight.reshape(1, self.OPERAND.shape[1]), F_new_formula[formula2]))
                     try :
-                        self.target = self.list_f_pro[-1]+0.00000000001
+                        self.target = self.list_f_pro[-1]+0.000000001
                     except:
                         continue
                     if F0[formula1] != F_new_formula[formula2]:
