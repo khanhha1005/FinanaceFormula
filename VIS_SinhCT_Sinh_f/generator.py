@@ -208,12 +208,9 @@ class Formula_generator(Base):
                             current_operator += 1
                             if current_operator > 3 : 
                                 current_operator = 0 
-                            if F_thu >= 3:
-                                if self.count[2] >= self.count[3] :
+                            if F_thu >= 2:
+                                if self.count[0] >= self.count[1] or self.count[2] >= self.count[3] :
                                     self.save_historyex(F_new_formula,current_formula1,current_formula2,current_operator,F_thu,F2)
-                                    raise Exception("Đã sinh đủ công thức")
-            if F_thu >= 3 :
-                self.save_historyex(F_new_formula,current_formula1,current_formula2,current_operator,F_thu,F2)
 
             if len(F1) == 0:
                 print('Đã sinh xong đến F cuối cùng ('+f'{F_thu*2})')
@@ -421,27 +418,19 @@ class Formula_generator(Base):
             "profit": self.list_inv_pro,
         })
         df = df.drop_duplicates()
-        chunk_size = self.count[1]
-        num_chunks = len(df) // chunk_size  # Calculate the number of complete chunks
-        remaining_rows = len(df) % chunk_size  # Calculate the number of remaining rows
-
-        # Save complete chunks
-        for i in range(num_chunks):
-            start_index = i * chunk_size
-            end_index = (i + 1) * chunk_size
-            chunk = df.iloc[start_index:end_index]  # Extract the chunk based on the indices
-            path = self.path + f"formula_"+f'{F_thu*2}'+f'{i}'+ f'{num_chunks}' + ".csv"
-            chunk.to_csv(path, index=False)  # Save the chunk as a CSV file
-
-        # Save remaining rows
-        if remaining_rows > 0:
-            start_index = num_chunks * chunk_size
-            remaining_chunk = df.iloc[start_index:]  # Extract the remaining rows
-            path = self.path + f"formula_"+f'{F_thu*2}'+f'{remaining_rows}'+ ".csv"
-            remaining_chunk.to_csv(path, index=False)  # Save the remaining chunk as a CSV file
-        print('Đã lưu công thức')
-        return False
-    
+        while True:
+            path = self.path + f"formula_" + datetime.now().strftime("%d_%m_%Y_%H_%M_%S") + ".csv"
+            if not os.path.exists(path):
+                df.to_csv(path, index=False)
+                self.count[0] = 0
+                self.list_f = []
+                self.list_f_pro = []
+                self.list_inv_cyc = []
+                self.list_inv_pro = []
+                print("Đã lưu công thức")
+                if self.count[2] >= self.count[3]:
+                    raise Exception("Đã sinh đủ công thức")
+                return False
 
             
             
