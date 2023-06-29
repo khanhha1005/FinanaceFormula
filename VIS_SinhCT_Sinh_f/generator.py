@@ -671,7 +671,7 @@ class Formula_generator(Base):
                     return True
 
         return False
-# Set target o day 
+
     def __measurement_method_1(self, weight, indexes, values, profits):
         if type(indexes[0]) == int or type(indexes[0]) == np.int64:
             f_profit = func.harmean(profits[:-1])
