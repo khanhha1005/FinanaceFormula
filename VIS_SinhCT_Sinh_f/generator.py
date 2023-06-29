@@ -14,7 +14,7 @@ INVESTMENT_METHODS = {
           cùng value là value max thì không đầu tư.''',
     1: '''Đầu tư các công ty có value của năm đầu tư và năm trước đó đều vượt ngưỡng cho
           trước. Hoặc, đầu tư tất cả các công ty vượt ngưỡng nếu năm trước đó không có công
-          ty nào vượt ngưỡng. Các trường hợp khác không đầu tư.''',
+          ty nào vượt ngưỡng. Các trường hợp khác không đầu tư.'''
 }
 
 
